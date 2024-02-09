@@ -13,7 +13,7 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Registro de Falhas'),
+        title: const Text('Vivi'),
       ),
       body: Stack(
         alignment: Alignment.topCenter,
