@@ -39,7 +39,7 @@ class Label {
   String getTemplate() {
     // String status = dto.aproved.toString().split('.')[1];
 
-    return '''
+    String labelBranca = '''
 'Seagull:2.1:DP
 INPUT OFF
 VERBOFF
@@ -134,5 +134,97 @@ LAYOUT RUN ""
 PF
 PRINT KEY OFF
 ''';
+
+
+
+String labelFermelha = ''''
+INPUT OFF
+VERBOFF
+INPUT ON
+SYSVAR(48) = 0
+SYSVAR(35)=0
+OPEN "tmp:setup.sys" FOR OUTPUT AS #1
+PRINT#1,"Printing,Media,Media Margin (X),0"
+PRINT#1,"Printing,Media,Clip Default,On"
+CLOSE #1
+SETUP "tmp:setup.sys"
+KILL "tmp:setup.sys"
+CLIP ON
+CLIP BARCODE ON
+LBLCOND 3,2
+CLL
+OPTIMIZE "BATCH" ON
+PP381,595:AN7
+DIR4
+NASC 8
+FT "CG Triumvirate Condensed Bold"
+FONTSIZE 10
+FONTSLANT 0
+PT "${op}"
+PP111,716:AN1
+DIR2
+PL654,178
+PP113,191:AN7
+DIR4
+II
+FONTSIZE 12
+PT "NAO UTILIZAR"
+PP201,81:PT "MATERIAL REJEITADO"
+PP333,591:NI
+FONTSIZE 7
+PT "Op"
+PP390,41:FONTSIZE 10
+PT "${pn}"
+PP466,40:FONTSIZE 7
+PT "Classificacao"
+PP510,38:FONTSIZE 10
+PT "${classificacaoParts[0]}"
+PP582,38:PT "${classificacaoParts[1]}"
+PP655,39:FONTSIZE 7
+PT "Motivo de rejeicao"
+PP884,36:FONTSIZE 10
+PT "${obsParts[0]}"
+PP956,36:PT "${obsParts[1]}"
+PP838,37:FONTSIZE 7
+PT "Observacao"
+PP1084,42:FONTSIZE 10
+PT "${req}"
+PP1035,44:FONTSIZE 7
+PT "Requisicao"
+PP1030,407:PT "Quantidade"
+PP1162,41:PT "Data"
+PP1208,40:FONTSIZE 10
+PT "${data}"
+PP337,42:FONTSIZE 7
+PT "Part number"
+PP698,38:FONTSIZE 10
+PT "${motivoParts[0]}"
+PP770,38:PT "${motivoParts[1]}"
+PP1074,411:PT "${qtd}"
+PP333,574:AN1
+DIR1
+PL127,6
+PP1282,760:DIR2
+PL745,6
+PP82,754:DIR1
+PL1203,6
+PP1030,396:PL127,6
+PP1154,757:DIR2
+PL740,6
+PP1025,758:PL743,6
+PP836,754:PL738,6
+PP646,754:PL739,6
+PP460,754:PL737,6
+PP329,758:PL743,6
+PP80,15:DIR1
+PL1208,6
+PP80,760:DIR2
+PL745,6
+LAYOUT RUN ""
+PF
+PRINT KEY OFF
+''';
+
+return labelFermelha;
   }
 }
