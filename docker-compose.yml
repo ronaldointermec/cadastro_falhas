@@ -1,0 +1,15 @@
+version: "2"
+
+services:
+  cadastro_falha:
+    logging:
+      driver: "json-file"
+      options:
+          max-size: "10m"  
+    restart: always
+    container_name: web_cadastro
+    build: 
+      dockerfile: ../BR92_Cadastro_Falhas/Dockerfile
+      context: ../BR92_Cadastro_Falhas/
+    ports:
+      - 8080:80

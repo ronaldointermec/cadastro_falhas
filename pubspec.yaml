@@ -1,0 +1,47 @@
+name: cadastro_falhas
+description: "A new Flutter project."
+
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.4.1 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.2
+  #firebase_core:
+  #cloud_firestore:
+  intl: 
+  build_runner: 
+  json_annotation: 
+  excel: 
+  csv: 
+  masked_text_field: 
+  #firebase_auth:
+  provider: 
+  path_provider: 
+  universal_html: 
+  permission_handler: 
+  mask_text_input_formatter: 
+  logger: 
+  shared_preferences:
+
+  firebase_core: ^3.0.0
+  cloud_functions: ^5.0.0
+  firebase_auth: ^5.0.0
+  cloud_firestore: ^5.0.0
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  json_serializable: 
+
+  flutter_lints: ^5.0.0
+
+flutter:
+
+  uses-material-design: true
+
+  assets:
+      - assets/
