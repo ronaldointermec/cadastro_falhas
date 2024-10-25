@@ -8,20 +8,29 @@ part of 'failure_register_dto.dart';
 
 FailureRegisterDTO _$FailureRegisterDTOFromJson(Map<String, dynamic> json) =>
     FailureRegisterDTO(
-      requester: json['requester'] as String,
+      requester: json['requester'] as String ?? '',
       partNumbers: (json['partNumbers'] as List<dynamic>)
           .map((e) => PartNumberDTO.fromJson(e as Map<String, dynamic>))
           .toList(),
-    )
-      ..docId = json['docId'] as String?
-      ..createdAt = json['createdAt'] == null
+      createdAt: json['createdAt'] == null
           ? null
-          : DateTime.parse(json['createdAt'] as String);
+          : DateTime.parse(
+              json['createdAt'] as String,
+            ),
+      docId: json['docId'] as String? ?? '',
+      reqId: json['reqId'] as String? ?? '',
+    );
+      // ..docId = json['docId'] as String?;
+      // ..createdAt = json['createdAt'] == null
+      //     ? null
+      //     : DateTime.parse(json['createdAt'] as String);
 
 Map<String, dynamic> _$FailureRegisterDTOToJson(FailureRegisterDTO instance) =>
     <String, dynamic>{
       'requester': instance.requester,
       'partNumbers': instance.partNumbers.map((e) => e.toJson()).toList(),
-      'docId': instance.docId,
-      'createdAt': instance.createdAt?.toIso8601String(),
+      if (instance.docId != null) 'docId': instance.docId,
+      if (instance.createdAt != null)
+        'createdAt': instance.createdAt?.toIso8601String(),
+      if(instance.reqId !=null) 'reqId':instance.reqId
     };

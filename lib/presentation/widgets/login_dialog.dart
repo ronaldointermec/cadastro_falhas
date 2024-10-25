@@ -1,9 +1,5 @@
-import 'package:cadastro_falhas/infra/providers/user_provider.dart';
 import 'package:cadastro_falhas/infra/services/firebase_login_service.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginDialog extends StatefulWidget {
   const LoginDialog({Key? key}) : super(key: key);
@@ -27,27 +23,32 @@ class _LoginDialogState extends State<LoginDialog> {
   }
 
   Future<void> _performAutoLogin() async {
+    debugPrint('_performAutoLogin');
     await _loginService
         .login('cadastrofalhas@honeywell.com', 'honeywellitajuba')
         .then((completed) async {
       if (completed) {
-        _saveCredentials();
-        Provider.of<UserProvider>(context, listen: false)
-            .updateUser(FirebaseAuth.instance.currentUser!);
+        debugPrint('Sucesso ao realizar login');
+        // _saveCredentials();
+        // Provider.of<UserProvider>(context, listen: false)
+        //     .updateUser(FirebaseAuth.instance.currentUser!);
         _showSnackBar('Carregando informações...');
         Navigator.pop(context);
       } else {
+        debugPrint('Falha ao realizar login');
         _showSnackBar('Falha no login. Tente novamente.');
       }
     });
   }
 
-  Future<void> _saveCredentials() async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    prefs.setString(
-        'cadastrofalhas@honeywell.com', 'cadastrofalhas@honeywell.com');
-    prefs.setString('honeywellitajuba', 'honeywellitajuba');
-  }
+  // Future<void> _saveCredentials() async {
+  //   SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   prefs.setString(
+  //       'cadastrofalhas@honeywell.com', 'cadastrofalhas@honeywell.com');
+  //   prefs.setString('honeywellitajuba', 'honeywellitajuba');
+  //   prefs.getString('');
+  //
+  // }
 
   void _showSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(

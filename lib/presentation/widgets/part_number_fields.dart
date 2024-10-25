@@ -1,30 +1,39 @@
+import 'package:cadastro_falhas/infra/dao/failure_dao.dart';
+import 'package:cadastro_falhas/infra/dao/rejection_reason_dao.dart';
 import 'package:cadastro_falhas/infra/providers/reason_provider.dart';
 import 'package:cadastro_falhas/presentation/dto/part_number_dto.dart';
 import 'package:cadastro_falhas/presentation/formatters/uppercase_formatter.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
+import 'package:flutter/foundation.dart';
 
 List<String> dropDownOptions = ['perda de processo', 'problema de qualidade'];
+List<String> familia = ['Fixo', 'IF1', 'Portateis', 'Scanner', 'TAG','RETRABALHO-ADAPTAÇÃO'];
 
 class PartNumberFields extends StatelessWidget {
   var dateController = TextEditingController();
+
   PartNumberFields({super.key, required this.onRemove});
   final Function(PartNumberFields) onRemove;
   final GlobalKey<FormState> _formKey = GlobalKey();
   final PartNumberDTO partNumberDTO = PartNumberDTO(
-    aproved: false,
+    aproved: ApprovalStatus.Aberto,
     partNumber: '',
     quantity: 0,
     failureClassification: null,
     requestDate: DateTime.now(),
+    family: '',
     orderNumber: '',
-    rejectionReason: null,
+    rejectionReasonNEW: null,
     observation: '',
     quantityServed: null,
     numberMircossiga: null,
   );
+  
+  List<String> data = [];
   final _controllers = [
     TextEditingController(),
     TextEditingController(),
@@ -39,6 +48,10 @@ class PartNumberFields extends StatelessWidget {
     if (text == null || text.isEmpty) return 'Campo obrigatório';
     return null;
   }
+
+ 
+
+  final RejectionReasonDAO _dao = RejectionReasonDAO();
 
   @override
   Widget build(BuildContext context) {
@@ -90,24 +103,44 @@ class PartNumberFields extends StatelessWidget {
                     decoration:
                         const InputDecoration(label: Text('Classificação')),
                   ),
+                  DropdownButtonFormField<String>(
+                    key: UniqueKey(),
+                    items: familia
+                        .map((e) => DropdownMenuItem(
+                              value: e,
+                              child: Text(e),
+                            ))
+                        .toList(),
+                    //value: familia,
+                    onChanged: (option) {
+                       Provider.of<ReasonProvider>(context, listen: false).reloadData(option ?? 'Fixo');
+                      partNumberDTO.family = option!;
+                    },
+                    validator: _validateField,
+                    decoration: const InputDecoration(label: Text('Familía')),
+                  ),
                   Consumer<ReasonProvider>(
                     builder: (context, value, child) {
+                      // Ordenar os dados alfabeticamente
+                      List<String> sortedData = List.from(value.data)..sort();
+                     // print("Sorted data " + sortedData.toString());
                       return DropdownButtonFormField<String>(
                         isExpanded: true,
                         key: UniqueKey(),
-                        items: value.data
+                        items: sortedData
                             .map((e) => DropdownMenuItem(
                                   value: e.toUpperCase(),
                                   child: Text(e.toUpperCase()),
                                 ))
                             .toList(),
-                        value: partNumberDTO.rejectionReason,
+                        //value: sortedData[0],
                         onChanged: (option) {
-                          partNumberDTO.rejectionReason = option!;
+                          partNumberDTO.rejectionReasonNEW = option!;
                         },
                         validator: _validateField,
                         decoration: const InputDecoration(
-                            label: Text('Motivo de rejeição')),
+                          label: Text('Motivo de rejeição'),
+                        ),
                       );
                     },
                   ),
@@ -160,7 +193,9 @@ class PartNumberFields extends StatelessWidget {
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
                         Navigator.pop(context, this);
-                        partNumberDTO.aproved = false;
+                        // partNumberDTO.aproved = true;
+
+                        partNumberDTO.aproved = ApprovalStatus.Aberto;
                       }
                     },
                     child: const Text('Adicionar'),

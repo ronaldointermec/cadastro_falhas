@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
 class ExportData extends StatefulWidget {
-  ExportData({super.key});
+  ExportData({Key? key}) : super(key: key);
   final FailureDAO _failureDAO = FailureDAO();
   final FileService _fileService = FileService();
   @override
@@ -21,8 +21,7 @@ class _ExportDataState extends State<ExportData> {
     setState(() {
       isTableVisible = true;
       filter = widget._failureDAO.get(startDate, finalDate);
-      if (!kReleaseMode) {
-      }
+      if (!kReleaseMode) {}
     });
   }
 
@@ -42,88 +41,102 @@ class _ExportDataState extends State<ExportData> {
                   spacing: 16,
                   children: [
                     ElevatedButton(
-                        onPressed: () async {
-                          var selectedDate = await showDatePicker(
-                              context: context,
-                              firstDate: DateTime(2000),
-                              lastDate: DateTime(DateTime.now().year + 3));
-                          setState(() {
-                            startDate = selectedDate;
-                          });
-                        },
-                        child: Text(startDate == null
-                            ? 'Data inicial'
-                            : DateFormat('dd/MM/yyyy')
-                                .format(startDate!)
-                                .toString())),
+                      onPressed: () async {
+                        var selectedDate = await showDatePicker(
+                          context: context,
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(DateTime.now().year + 3),
+                        );
+                        setState(() {
+                          startDate = selectedDate;
+                        });
+                      },
+                      child: Text(startDate == null
+                          ? 'Data inicial'
+                          : DateFormat('dd/MM/yyyy').format(startDate!)),
+                    ),
                     ElevatedButton(
-                        onPressed: () async {
-                          var selectedDate = await showDatePicker(
-                              context: context,
-                              firstDate: DateTime(2000),
-                              lastDate: DateTime(DateTime.now().year + 3));
-                          setState(() {
-                            finalDate = selectedDate;
-                          });
-                        },
-                        child: Text(finalDate == null
-                            ? 'Data final'
-                            : DateFormat('dd/MM/yyyy')
-                                .format(finalDate!)
-                                .toString())),
+                      onPressed: () async {
+                        var selectedDate = await showDatePicker(
+                          context: context,
+                          firstDate: DateTime(2000),
+                          lastDate: DateTime(DateTime.now().year + 3),
+                        );
+                        setState(() {
+                          finalDate = selectedDate;
+                        });
+                      },
+                      child: Text(finalDate == null
+                          ? 'Data final'
+                          : DateFormat('dd/MM/yyyy').format(finalDate!)),
+                    ),
                     ElevatedButton(
-                        onPressed: (startDate != null || finalDate != null)
-                            ? () {
-                                search();
-                              }
-                            : null,
-                        child: const Text('Buscar')),
+                      onPressed: (startDate != null || finalDate != null)
+                          ? () {
+                              search();
+                            }
+                          : null,
+                      child: const Text('Buscar'),
+                    ),
                   ],
                 ),
               if (isTableVisible)
                 FutureBuilder(
-                    future: filter,
-                    builder: ((context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return const Expanded(
-                          child: Center(child: CircularProgressIndicator()),
-                        );
-                      } else {
-                        if (snapshot.hasData && snapshot.data != null) {
-                          return Expanded(
-                            child: Column(
-                              children: [
-                                Wrap(spacing: 16, children: [
+                  future: filter,
+                  builder: ((context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Expanded(
+                        child: Center(child: CircularProgressIndicator()),
+                      );
+                    } else {
+                      if (snapshot.hasData && snapshot.data != null) {
+                        return Expanded(
+                          child: Column(
+                            children: [
+                              Wrap(
+                                spacing: 16,
+                                children: [
                                   ElevatedButton(
-                                      onPressed: () {
-                                        setState(() {
-                                          isTableVisible = false;
-                                        });
-                                      },
-                                      child: const Text('Filtrar novamente')),
-                                  ElevatedButton(
-                                      onPressed: () {
-                                        widget._fileService
-                                            .createFailureRegisterCsv(
-                                                snapshot.data);
-                                      },
-                                      child: const Text('Exportar')),
-                                ]),
-                                const SizedBox(
-                                  height: 8,
-                                ),
-                                Expanded(
-                                  child: SingleChildScrollView(
-                                    child: PartNumberTable(data: snapshot.data),
+                                    onPressed: () {
+                                      setState(() {
+                                        isTableVisible = false;
+                                      });
+                                    },
+                                    child: const Text('Filtrar novamente'),
                                   ),
-                                )
-                              ],
-                            ),
-                          );
-                        }
+                                  ElevatedButton(
+                                    onPressed: () {
+                                      widget._fileService
+                                          .createFailureRegisterCsv(
+                                        snapshot.data,
+                                      );
+                                    },
+                                    child: const Text('Exportar'),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(
+                                height: 8,
+                              ),
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: SingleChildScrollView(
+                                    scrollDirection: Axis.vertical,
+                                    child: PartNumberTable(
+                                        data: snapshot.data.reversed
+                                            .toList()), // Revertendo a lista
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        );
                       }
-                      return Container();
-                    }))
+                    }
+                    return Container();
+                  }),
+                ),
             ],
           ),
         ),

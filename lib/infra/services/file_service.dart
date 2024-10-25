@@ -39,6 +39,7 @@ class FileService {
     rows.add([
       "Requisitante",
       "Criado em",
+      "Família",
       "Part number",
       "Número da ordem",
       "Classificação de falha",
@@ -53,20 +54,19 @@ class FileService {
     for (var row in snapshot) {
       FailureRegisterDTO dto = FailureRegisterDTO.fromJson(row.data());
       for (var failure in dto.partNumbers) {
-        String aprovalStatus =
-            failure.aproved ? 'Aprovado' : 'Aguardando Aprovação';
         List<dynamic> cells = [
           dto.requester,
           DateFormat('dd/MM/yyyy').format(dto.createdAt!),
+          failure.family,
           failure.partNumber,
           failure.orderNumber,
           failure.failureClassification,
-          failure.rejectionReason,
+          failure.rejectionReasonNEW,
           failure.observation,
           failure.quantity,
           failure.quantityServed,
           failure.numberMircossiga,
-          aprovalStatus,
+          failure.aproved,
         ];
         rows.add(cells);
       }

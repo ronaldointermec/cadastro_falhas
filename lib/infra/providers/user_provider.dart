@@ -7,5 +7,6 @@ class UserProvider extends ChangeNotifier{
 
   updateUser(User credential){
     user = credential;
+
   }
 }

@@ -1,16 +1,19 @@
 import 'package:cadastro_falhas/infra/dao/failure_dao.dart';
+import 'package:cadastro_falhas/infra/dao/rejection_reason_dao.dart';
 import 'package:cadastro_falhas/infra/providers/reason_provider.dart';
 import 'package:cadastro_falhas/presentation/dto/failure_register_dto.dart';
 import 'package:cadastro_falhas/presentation/formatters/uppercase_formatter.dart';
 import 'package:cadastro_falhas/presentation/pages/home.dart';
 import 'package:cadastro_falhas/presentation/widgets/part_number_selection.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 
 class FailureRegisterForm extends StatefulWidget {
   FailureRegisterForm({super.key});
+
   final FailureRegisterDTO _failureRegisterDTO =
-      FailureRegisterDTO(requester: '', partNumbers: [],);
+      FailureRegisterDTO(requester: '', partNumbers: []);
   final FailureDAO _failureDAO = FailureDAO();
 
   @override
@@ -31,10 +34,11 @@ class _FailureRegisterFormState extends State<FailureRegisterForm> {
   @override
   void initState() {
     super.initState();
-    Provider.of<ReasonProvider>(context, listen: false).initData();
+    Provider.of<ReasonProvider>(context, listen: false).initData('Fixo');
   }
 
   bool loading = false;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -131,35 +135,39 @@ class _FailureRegisterFormState extends State<FailureRegisterForm> {
                   ),
                   if (_key.currentState?.addedPartNumbers.isNotEmpty ?? false)
                     ElevatedButton(
-                        onPressed: loading
-                            ? null
-                            : () async {
-                                if (_formKey.currentState!.validate()) {
-                                  for (var pn
-                                      in _key.currentState!.addedPartNumbers) {
-                                    widget._failureRegisterDTO.partNumbers
-                                        .add(pn.partNumber);
-                                  }
-                                  setState(() {
-                                    loading = true;
-                                  });
-                                  await widget._failureDAO
-                                      .create(widget._failureRegisterDTO)
-                                      .then((value) =>
-                                          Navigator.pushAndRemoveUntil(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      const Home()),
-                                              (route) => false));
-                                  setState(() {
-                                    loading = false;
-                                  });
+                      onPressed: loading
+                          ? null
+                          : () async {
+                              if (_formKey.currentState!.validate()) {
+                                for (var pn
+                                    in _key.currentState!.addedPartNumbers) {
+                                  widget._failureRegisterDTO.partNumbers
+                                      .add(pn.partNumber);
                                 }
-                              },
-                        child: loading
-                            ? const CircularProgressIndicator()
-                            : const Text('Salvar cadastro'))
+                                setState(() {
+                                  loading = true;
+                                });
+                                widget._failureRegisterDTO.createdAt =
+                                    DateTime.parse(DateFormat('yyyy-MM-dd')
+                                        .format(DateTime.now()));
+                                await widget._failureDAO
+                                    .create(widget._failureRegisterDTO)
+                                    .then((value) =>
+                                        Navigator.pushAndRemoveUntil(
+                                            context,
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    const Home()),
+                                            (route) => false));
+                                setState(() {
+                                  loading = false;
+                                });
+                              }
+                            },
+                      child: loading
+                          ? const CircularProgressIndicator()
+                          : const Text('Salvar cadastro'),
+                    )
                 ],
               ),
             ),
