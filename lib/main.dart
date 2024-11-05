@@ -1,5 +1,7 @@
 import 'package:cadastro_falhas/firebase_options.dart';
+import 'package:cadastro_falhas/infra/providers/family_provider.dart';
 import 'package:cadastro_falhas/infra/providers/reason_provider.dart';
+import 'package:cadastro_falhas/infra/providers/register_provider.dart';
 import 'package:cadastro_falhas/infra/services/global.dart';
 import 'package:cadastro_falhas/infra/services/mobile_socket_service.dart';
 import 'package:cadastro_falhas/presentation/pages/home.dart';
@@ -44,7 +46,17 @@ class MyApp extends StatelessWidget {
             data: [],
           ),
         ),
-        ChangeNotifierProvider(create: (_) => MobileSocketService())
+        ChangeNotifierProvider(
+          create: (_) => MobileSocketService(),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => FamilyProvider(
+            data: [],
+          ),
+        ),
+        ChangeNotifierProvider(
+          create: (context) => RegisterProvider(),
+        ),
       ],
       child: MaterialApp(
         title: 'Cadastro de Falhas',

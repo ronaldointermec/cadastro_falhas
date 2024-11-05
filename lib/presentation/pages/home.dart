@@ -8,6 +8,7 @@ import 'package:cadastro_falhas/presentation/widgets/login_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
 
+import '../widgets/custom_drawer.dart';
 import '../widgets/ip_dialog.dart';
 
 class Home extends StatelessWidget {
@@ -15,11 +16,14 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
     FirebaseAuth auth = FirebaseAuth.instance;
     return Scaffold(
+      backgroundColor: Colors.grey[300],
       appBar: AppBar(
         title: const Text('Registro de falhas'),
       ),
+      endDrawer: CustomDrawer(),
       body: Stack(
         alignment: Alignment.topCenter,
         children: [
@@ -130,25 +134,27 @@ class Home extends StatelessWidget {
                       ),
                     ],
                   ),
-                 !kIsWeb ? ElevatedButton(
-                    onPressed: () {
-                      showDialog(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: Text("Insira o endereço de IP"),
-                            content: IpDialog(),
-                          );
-                        },
-                      );
-
-                    },
-                    child: const Text('Configurar Impressora'),
-                  ) : Container(),
+                  !kIsWeb
+                      ? ElevatedButton(
+                          onPressed: () {
+                            showDialog(
+                              context: context,
+                              builder: (BuildContext context) {
+                                return AlertDialog(
+                                  title: Text("Insira o endereço de IP"),
+                                  content: IpDialog(),
+                                );
+                              },
+                            );
+                          },
+                          child: const Text('Configurar Impressora'),
+                        )
+                      : Container(),
                 ]),
           ),
         ],
-      ),
+    ),
     );
   }
 }
+

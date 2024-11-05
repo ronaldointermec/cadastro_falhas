@@ -1,4 +1,5 @@
 import 'package:cadastro_falhas/infra/dao/failure_dao.dart';
+import 'package:cadastro_falhas/infra/providers/family_provider.dart';
 import 'package:cadastro_falhas/infra/services/mobile_socket_service.dart';
 import 'package:cadastro_falhas/presentation/dto/failure_register_dto.dart';
 import 'package:cadastro_falhas/presentation/widgets/part_number_selection.dart';
@@ -12,22 +13,22 @@ import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:flutter/foundation.dart';
 
 List<String> dropDownOptions = ['perda de processo', 'problema de qualidade'];
-List<String> familia = [
-  'Fixo',
-  'IF1',
-  'Portateis',
-  'Scanner',
-  'TAG',
-  'RETRABALHO-ADAPTAÇÃO'
-];
+// List<String> familia = [
+//   'Fixo',
+//   'IF1',
+//   'Portateis',
+//   'Scanner',
+//   'TAG',
+//   'RETRABALHO-ADAPTAÇÃO'
+// ];
 
 class EditPartNumber extends StatefulWidget {
   EditPartNumber({required this.dto, required this.docId, required this.index});
 
-  final FailureRegisterDTO _failureRegisterDTO = FailureRegisterDTO(
-    requester: '',
-    partNumbers: [],
-  );
+  // final FailureRegisterDTO _failureRegisterDTO = FailureRegisterDTO(
+  //   requester: '',
+  //   partNumbers: [],
+  // );
 
   final FailureDAO _failureDAO = FailureDAO();
   final FailureRegisterDTO dto;
@@ -56,6 +57,7 @@ class _EditPartNumberState extends State<EditPartNumber> {
 
   bool loading = false;
   bool isApproved = false;
+  bool isFamelyDifferent = false;
 
   @override
   void initState() {
@@ -72,6 +74,8 @@ class _EditPartNumberState extends State<EditPartNumber> {
 
   @override
   Widget build(BuildContext context) {
+    Provider.of<FamilyProvider>(context).initData();
+
     return context.watch<MobileSocketService>().isPrinting
         ? Scaffold(
             appBar: AppBar(
@@ -141,33 +145,79 @@ class _EditPartNumberState extends State<EditPartNumber> {
                         decoration:
                             const InputDecoration(label: Text('Classificação')),
                       ),
-                      DropdownButtonFormField<String>(
-                        key: UniqueKey(),
-                        items: familia
-                            .map((e) => DropdownMenuItem(
-                                  value: e,
-                                  child: Text(e),
-                                ))
-                            .toList(),
-                        value:
-                            widget.dto.partNumbers[widget.index].family ?? "",
-                        onChanged: isApproved
-                            ? null
-                            : (option) {
-                                Provider.of<ReasonProvider>(context,
-                                        listen: false)
-                                    .reloadData(option ?? 'Fixo');
-                                widget.dto.partNumbers[widget.index].family =
-                                    option!;
-                              },
-                        validator: _validateField,
-                        decoration:
-                            const InputDecoration(label: Text('Famália')),
+                      // DropdownButtonFormField<String>(
+                      //   key: UniqueKey(),
+                      //   items: familia
+                      //       .map((e) => DropdownMenuItem(
+                      //             value: e,
+                      //             child: Text(e),
+                      //           ))
+                      //       .toList(),
+                      //   value:
+                      //       widget.dto.partNumbers[widget.index].family ?? "",
+                      //   onChanged: isApproved
+                      //       ? null
+                      //       : (option) {
+                      //           Provider.of<ReasonProvider>(context,
+                      //                   listen: false)
+                      //               .reloadData(option ?? 'Fixo');
+                      //           widget.dto.partNumbers[widget.index].family =
+                      //               option!;
+                      //         },
+                      //   validator: _validateField,
+                      //   decoration:
+                      //       const InputDecoration(label: Text('Famália')),
+                      // ),
+                      Consumer<FamilyProvider>(
+                        builder: (context, value, child) {
+                          List<String> _sortedData = List.from(value.data)..sort();
+
+                          return DropdownButtonFormField<String>(
+                            key: UniqueKey(),
+                            items: _sortedData
+                                .toSet()
+                                .toList()
+                                .map((e) => DropdownMenuItem(
+                                      value: e,
+                                      child: Text(e),
+                                    ))
+                                .toList(),
+                            value:
+                                widget.dto.partNumbers[widget.index].family ??
+                                    "",
+                            onChanged: isApproved
+                                ? null
+                                : (option) {
+                                    if (option != null &&
+                                        widget.dto.partNumbers[widget.index]
+                                                .family !=
+                                            option!) {
+                                      widget.dto.partNumbers[widget.index]
+                                          .family = option!;
+
+                                      Provider.of<ReasonProvider>(context,
+                                              listen: false)
+                                          .reloadData(option);
+                                    }
+                                  },
+                            validator: _validateField,
+                            decoration:
+                                const InputDecoration(label: Text('Família')),
+                          );
+                        },
                       ),
+
                       Consumer<ReasonProvider>(
                         builder: (context, value, child) {
-                          List<String> _sortedData = List.from(value.data)
+                          List<String> _sortedData = List.from(
+                            value.data.map(
+                              (str) => str.toUpperCase(),
+                            ),
+                          ) // Convert each string to uppercase
                             ..sort();
+
+                          bool isIqual = _sortedData.contains(widget.dto
+                              .partNumbers[widget.index].rejectionReasonNEW);
                           return DropdownButtonFormField<String>(
                             isExpanded: true,
                             key: UniqueKey(),
@@ -179,8 +229,10 @@ class _EditPartNumberState extends State<EditPartNumber> {
                                   );
                                 }).toList() ??
                                 [],
-                            value: widget.dto.partNumbers[widget.index]
-                                .rejectionReasonNEW,
+                            value: isIqual
+                                ? widget.dto.partNumbers[widget.index]
+                                    .rejectionReasonNEW
+                                : null,
                             onChanged: isApproved
                                 ? null
                                 : (option) {
