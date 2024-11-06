@@ -1,11 +1,16 @@
+import 'package:cadastro_falhas/infra/dao/register_dao.dart';
+import 'package:cadastro_falhas/infra/providers/family_provider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class RegisterProvider extends ChangeNotifier {
   bool isNewFamily = false;
   final formKey = GlobalKey<FormState>();
   final familyController = TextEditingController();
   final reasonController = TextEditingController();
+  final RegisterDAO dao = RegisterDAO();
+
 
   void taggleFamily() {
     isNewFamily = !isNewFamily;
@@ -15,26 +20,56 @@ class RegisterProvider extends ChangeNotifier {
   void submit(context) {
     if (formKey.currentState!.validate()) {
       if (isNewFamily) {
-        print('Família: ${reasonController.value.text}');
-        clean(context);
+        createFamily(context);
       } else {
-        print('Família: ${familyController.value.text}');
-        print('Moitvo: ${reasonController.value.text}');
-        clean(context);
+        createReason(context);
+
+
       }
     }
   }
 
-  void clean(context) {
+  void createFamily(context) async {
+    String message =
+        await dao.createFamily(family: reasonController.value.text);
+    bool isError = message.contains('Erro');
+
     Navigator.of(context).pop();
+
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('Cadastro realizado com sucesso!'),
+        content: Text(message),
         duration: Duration(seconds: 2),
-        backgroundColor: Colors.green,
+        backgroundColor: isError ? Colors.red : Colors.green,
       ),
     );
+    clean();
+    debugPrint('start provider');
+    // Provider.of<FamilyProvider>(context,listen: true).reloadData();
+    // Provider.of<FamilyProvider>(context,listen: true).initData();
+    debugPrint('end provider');
 
+  }
+
+  void createReason(context) async {
+    String message = await dao.createReason(
+        family: familyController.value.text,
+        reason: reasonController.value.text);
+    bool isError = message.contains('Erro');
+
+    Navigator.of(context).pop();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 2),
+        backgroundColor: isError ? Colors.red : Colors.green,
+      ),
+    );
+    clean();
+  }
+
+  void clean() {
     familyController.clear();
     reasonController.clear();
   }
