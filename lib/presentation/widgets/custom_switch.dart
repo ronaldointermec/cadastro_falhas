@@ -1,7 +1,6 @@
 import 'package:cadastro_falhas/infra/providers/register_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
 import '../../infra/services/global.dart';
 
 class CustomSwitch extends StatelessWidget {

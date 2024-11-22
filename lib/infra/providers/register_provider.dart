@@ -1,8 +1,5 @@
 import 'package:cadastro_falhas/infra/dao/register_dao.dart';
-import 'package:cadastro_falhas/infra/providers/family_provider.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 
 class RegisterProvider extends ChangeNotifier {
   bool isNewFamily = false;
@@ -10,7 +7,6 @@ class RegisterProvider extends ChangeNotifier {
   final familyController = TextEditingController();
   final reasonController = TextEditingController();
   final RegisterDAO dao = RegisterDAO();
-
 
   void taggleFamily() {
     isNewFamily = !isNewFamily;
@@ -23,8 +19,6 @@ class RegisterProvider extends ChangeNotifier {
         createFamily(context);
       } else {
         createReason(context);
-
-
       }
     }
   }
@@ -45,10 +39,7 @@ class RegisterProvider extends ChangeNotifier {
     );
     clean();
     debugPrint('start provider');
-    // Provider.of<FamilyProvider>(context,listen: true).reloadData();
-    // Provider.of<FamilyProvider>(context,listen: true).initData();
     debugPrint('end provider');
-
   }
 
   void createReason(context) async {
