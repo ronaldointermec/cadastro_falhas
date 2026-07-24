@@ -1,6 +1,6 @@
 {
-    "name": "cadastro_falhas",
-    "short_name": "cadastro_falhas",
+    "name": "Cadastro de Falhas",
+    "short_name": "Cadastro de Falhas",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
