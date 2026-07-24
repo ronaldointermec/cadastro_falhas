@@ -16,7 +16,6 @@ class Home extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     FirebaseAuth auth = FirebaseAuth.instance;
     return Scaffold(
       backgroundColor: Colors.grey[300],
@@ -33,11 +32,14 @@ class Home extends StatelessWidget {
                 maxWidth:
                     kIsWeb ? constraint.maxWidth * 0.5 : constraint.maxWidth,
               ),
-              child: const Image(
-                image: AssetImage(
-                  'assets/logo.png',
-                ),
-              ),
+              child: Padding(
+                  padding: const EdgeInsets.only(top: 130),
+                  child: Image(
+                    image: AssetImage('assets/logo.png'),
+                    // width: 300, // Ajuste este valor para o tamanho desejado
+                    // fit: BoxFit.fitHeight,
+                    height: 120.0,
+                  )),
             );
           }),
           Center(
@@ -153,8 +155,7 @@ class Home extends StatelessWidget {
                 ]),
           ),
         ],
-    ),
+      ),
     );
   }
 }
-
