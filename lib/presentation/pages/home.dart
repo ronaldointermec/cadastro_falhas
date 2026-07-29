@@ -33,12 +33,12 @@ class Home extends StatelessWidget {
                     kIsWeb ? constraint.maxWidth * 0.5 : constraint.maxWidth,
               ),
               child: Padding(
-                  padding: const EdgeInsets.only(top: 130),
+                  padding: const EdgeInsets.only(top: kIsWeb ? 130 : 80),
                   child: Image(
                     image: AssetImage('assets/logo.png'),
                     // width: 300, // Ajuste este valor para o tamanho desejado
                     // fit: BoxFit.fitHeight,
-                    height: 120.0,
+                    height: kIsWeb ? 120.0 : 50,
                   )),
             );
           }),

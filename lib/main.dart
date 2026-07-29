@@ -21,6 +21,9 @@ void main() async {
   var app = await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // FirebaseFirestore.setLoggingEnabled(true);
+
   FirebaseAuth.instanceFor(app: app);
 
   debugPrint('iniciando o main');
