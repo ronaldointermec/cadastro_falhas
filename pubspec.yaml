@@ -1,10 +1,10 @@
 name: cadastro_falhas
 description: "A new Flutter project."
 
-version: 1.0.0+1
+version: 1.0.0+2
 
 environment:
-  sdk: '>=3.4.1 <4.0.0'
+  sdk: ">=3.4.1 <4.0.0"
 
 dependencies:
   flutter:
@@ -13,35 +13,39 @@ dependencies:
   cupertino_icons: ^1.0.2
   #firebase_core:
   #cloud_firestore:
-  intl: 
-  build_runner: 
-  json_annotation: 
-  excel: 
-  csv: 
-  masked_text_field: 
-  #firebase_auth:
-  provider: 
-  path_provider: 
-  universal_html: 
-  permission_handler: 
-  mask_text_input_formatter: 
-  logger: 
-  shared_preferences:
+  intl: ^0.19.0
+  build_runner: ^2.4.9
+  json_annotation: ^4.9.0
+  excel: ^4.0.0
+  csv: 5.1.1
+  masked_text_field: ^1.0.2
+  provider: ^6.1.2
+  path_provider: ^2.1.3
+  universal_html: ^2.2.4
+  permission_handler: ^11.3.1
+  mask_text_input_formatter: ^2.9.0
+  logger: ^2.3.0
+  shared_preferences: ^2.2.3
+  share_plus: ^7.2.1
 
-  firebase_core: ^3.0.0
-  cloud_functions: ^5.0.0
-  firebase_auth: ^5.0.0
-  cloud_firestore: ^5.0.0
+  firebase_core: ^4.12.1
+  cloud_functions: ^6.3.5
+  firebase_auth: ^6.5.6
+  cloud_firestore: ^6.7.1
+
+  #firebase_core: 3.0.0
+  #cloud_functions: 5.0.0
+  #firebase_auth: 5.0.0
+  #cloud_firestore: 5.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  json_serializable: 
+  json_serializable:
 
-  flutter_lints: ^5.0.0
+  flutter_lints: ^6.0.0
 
 flutter:
-
   uses-material-design: true
 
   assets:
-      - assets/
+    - assets/
