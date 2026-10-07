@@ -184,9 +184,15 @@ class _EditFailureState extends State<EditFailure> {
                                 }).toList()
                               : [
                                   DataRow(cells: [
-                                    DataCell(Text('Nehum dado disponível'))
+                                    DataCell(Text('Nenhum dado disponível')),
+                                    DataCell(Text('')),
+                                    DataCell(Text('')),
+                                    DataCell(Text('')),
+                                    DataCell(Text('')),
+                                    DataCell(Text('')),
+                                    DataCell(Text('')),
+                                    DataCell(Text('')),
                                   ])
-                                  // Fallback for empty list
                                 ],
                         ),
                         if (_key.currentState?.addedPartNumbers.isNotEmpty ??
