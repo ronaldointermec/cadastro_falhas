@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:cadastro_falhas/presentation/dto/failure_register_dto.dart';
+import 'package:cadastro_falhas/presentation/dto/part_number_dto.dart';
 
 class DeleteFailure extends StatefulWidget {
   DeleteFailure({required this.dto, required this.docId, this.index});
@@ -40,7 +41,8 @@ class _DeleteFailureState extends State<DeleteFailure> {
               await deleteItem(widget.dto, widget.docId, widget.index!);
             }
 
-            Navigator.pop(context, true); // Pass 'true' back to indicate deletion was confirmed
+            Navigator.pop(context,
+                true); // Pass 'true' back to indicate deletion was confirmed
           },
           child: loading ? CircularProgressIndicator() : Text('Excluir'),
         ),
@@ -54,6 +56,11 @@ class _DeleteFailureState extends State<DeleteFailure> {
     try {
       // Delete the document from the Firestore collection
       await db.doc(docId).delete();
+
+      await FirebaseFirestore.instance
+          .collection('failures_list')
+          .doc(docId)
+          .delete();
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Falha removida com sucesso')),
@@ -90,23 +97,55 @@ class _DeleteFailureState extends State<DeleteFailure> {
   //   }
   // }
 
-  Future<void> deleteItem(FailureRegisterDTO dto, String docId, int index) async {
+  Future<void> deleteItem(
+      FailureRegisterDTO dto, String docId, int index) async {
     final db = FirebaseFirestore.instance.collection('failures').doc(docId);
 
     try {
       if (widget.dto.partNumbers.length > 1) {
         await db.update({
-          'partNumbers': FieldValue.arrayRemove([dto.partNumbers[index].toJson()])
+          'partNumbers':
+              FieldValue.arrayRemove([dto.partNumbers[index].toJson()])
         });
-      } else {
-        await deleteData(dto, docId); // Delete entire document if it's the last entry
-      }
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Falha removida com sucesso')),
-      );
 
+        var updatedDoc = await db.get();
+
+        if (updatedDoc.exists) {
+          final data = updatedDoc.data()!;
+
+          FailureRegisterDTO updatedDto = FailureRegisterDTO.fromJson(data);
+
+          bool hasApproved = updatedDto.partNumbers.any(
+            (pn) => pn.aproved == ApprovalStatus.Aprovado,
+          );
+
+          await FirebaseFirestore.instance
+              .collection('failures_list')
+              .doc(docId)
+              .set({
+            'docId': docId,
+            'reqId': updatedDto.reqId,
+            'requester': updatedDto.requester,
+            'createdAt': updatedDto.createdAt?.toIso8601String(),
+            'family': updatedDto.partNumbers.isNotEmpty
+                ? updatedDto.partNumbers.first.family
+                : '',
+            'hasApproved': hasApproved,
+          }, SetOptions(merge: true));
+        }
+      } else {
+        await deleteData(dto, docId);
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Falha removida com sucesso'),
+        ),
+      );
     } catch (e) {
-      print('Error deleting document: $e');
+      print(
+        'Error deleting document: $e',
+      );
     }
   }
 }

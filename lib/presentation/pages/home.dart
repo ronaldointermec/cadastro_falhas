@@ -7,6 +7,7 @@ import 'package:cadastro_falhas/presentation/pages/validation_failure.dart';
 import 'package:cadastro_falhas/presentation/widgets/login_dialog.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/foundation.dart';
+//import 'package:cadastro_falhas/infra/dao/failure_dao.dart';
 
 import '../widgets/custom_drawer.dart';
 import '../widgets/ip_dialog.dart';
@@ -65,6 +66,7 @@ class Home extends StatelessWidget {
                               builder: (context) => LoginDialog(),
                             );
                           } else {
+                            //await FailureDAO().migrateFailureList();
                             Navigator.push(
                               context,
                               MaterialPageRoute(
