@@ -86,7 +86,12 @@ class _ExportDataState extends State<ExportData> {
                   builder: ((context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Expanded(
-                        child: Center(child: CircularProgressIndicator()),
+                        child: Center(
+                          child: Text(
+                            'Carregando...',
+                            style: TextStyle(fontSize: 18),
+                          ),
+                        ),
                       );
                     } else {
                       if (snapshot.hasData && snapshot.data != null) {

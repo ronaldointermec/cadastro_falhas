@@ -83,7 +83,10 @@ class _ValidationFailureState extends State<ValidationFailure> {
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return const Center(
-                        child: CircularProgressIndicator(),
+                        child: Text(
+                          'Carregando dados...',
+                          style: TextStyle(fontSize: 18),
+                        ),
                       );
                     } else if (snapshot.hasError) {
                       return Center(

@@ -165,7 +165,12 @@ class _FailureRegisterFormState extends State<FailureRegisterForm> {
                               }
                             },
                       child: loading
-                          ? const CircularProgressIndicator()
+                          ? Center(
+                              child: Text(
+                                'Carregando...',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            )
                           : const Text('Salvar cadastro'),
                     )
                 ],
