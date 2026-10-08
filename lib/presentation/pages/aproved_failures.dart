@@ -119,12 +119,14 @@ class _AprovedFailureState extends State<AprovedFailure> {
                       ? const Center(
                           child: Text('Nenhum dado encontrado.'),
                         )
-                      : SingleChildScrollView(
-                          scrollDirection: Axis.horizontal,
+                      : Center(
                           child: SingleChildScrollView(
-                            scrollDirection: Axis.vertical,
-                            child: PartNumberTable(
-                              data: data,
+                            scrollDirection: Axis.horizontal,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.vertical,
+                              child: PartNumberTable(
+                                data: data,
+                              ),
                             ),
                           ),
                         ),
