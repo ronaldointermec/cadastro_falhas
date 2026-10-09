@@ -1,21 +1,22 @@
-import 'package:cadastro_falhas/presentation/dto/failure_register_dto.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:cadastro_falhas/presentation/pages/edit_failure.dart';
 import 'package:cadastro_falhas/presentation/pages/delete_failure.dart';
+import 'package:cadastro_falhas/infra/dao/failure_dao.dart';
 
-class PartNumberTable extends StatefulWidget {
-  const PartNumberTable({super.key, required this.data});
+class PartNumberTableAproved extends StatefulWidget {
+  const PartNumberTableAproved({super.key, required this.data});
 
   final List<QueryDocumentSnapshot<Map<String, dynamic>>> data;
 
   @override
-  State<PartNumberTable> createState() => _PartNumberTableState();
+  State<PartNumberTableAproved> createState() => _PartNumberTableAprovedState();
 }
 
-class _PartNumberTableState extends State<PartNumberTable> {
+class _PartNumberTableAprovedState extends State<PartNumberTableAproved> {
+  final FailureDAO _failureDAO = FailureDAO();
   @override
   Widget build(BuildContext context) {
     int idCounter = 1; // Inicializa o contador de ID
@@ -31,14 +32,13 @@ class _PartNumberTableState extends State<PartNumberTable> {
         DataColumn(label: Expanded(child: Text('Excluir'))),
       ],
       rows: widget.data.asMap().entries.map((element) {
-        FailureRegisterDTO dto =
-            FailureRegisterDTO.fromJson(element.value.data());
+        final item = element.value.data();
         int index = element.key;
 
         // Atribui o ID e incrementa o contador
         int currentId = 0;
-        if (dto.reqId != null) {
-          currentId = int.tryParse(dto.reqId!) ?? idCounter++;
+        if (item['reqId'] != null) {
+          currentId = int.tryParse(item['reqId'].toString()) ?? idCounter++;
         } else {
           currentId = idCounter++;
         }
@@ -46,19 +46,33 @@ class _PartNumberTableState extends State<PartNumberTable> {
         return DataRow(cells: [
           DataCell(Text(currentId.toString())),
           // Display the id here
-          DataCell(Text(dto.partNumbers.first.family.toString())),
+          DataCell(Text(item['family'] ?? '')),
           // Display the id here
-          DataCell(Text(dto.requester)),
-          DataCell(Text(DateFormat('dd/MM/yyyy').format(dto.createdAt!))),
+          DataCell(Text(item['requester'] ?? '')),
+          DataCell(
+            Text(
+              item['createdAt'] != null
+                  ? DateFormat('dd/MM/yyyy').format(
+                      DateTime.parse(item['createdAt']),
+                    )
+                  : '',
+            ),
+          ),
           DataCell(IconButton(
             icon: const Icon(Icons.edit),
-            onPressed: () {
+            onPressed: () async {
+              final dto = await _failureDAO.getFailureByDocId(item['docId']);
+
+              if (dto == null) {
+                return;
+              }
+
               Navigator.push(
                 context,
                 MaterialPageRoute(
                   builder: (context) => EditFailure(
                     dto: dto,
-                    docId: element.value.id,
+                    docId: item['docId'],
                   ),
                 ),
               );
@@ -66,21 +80,25 @@ class _PartNumberTableState extends State<PartNumberTable> {
           )),
           DataCell(IconButton(
             icon: const Icon(Icons.delete),
-            onPressed: () {
+            onPressed: () async {
+              final dto = await _failureDAO.getFailureByDocId(item['docId']);
+
+              if (dto == null) {
+                return;
+              }
+
               showDialog(
                 context: context,
                 builder: (context) {
                   return DeleteFailure(
                     dto: dto,
-                    docId: element.value.id,
-                    //index: index,
+                    docId: item['docId'],
                   );
                 },
               ).then((result) {
                 if (result == true) {
                   setState(() {
                     widget.data.removeAt(index);
-                    // widget.dto.partNumbers.removeAt(index);
                   });
                 }
               });

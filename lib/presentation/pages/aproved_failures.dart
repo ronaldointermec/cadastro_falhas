@@ -1,5 +1,5 @@
 import 'package:cadastro_falhas/infra/dao/failure_dao.dart';
-import 'package:cadastro_falhas/presentation/widgets/part_number_table.dart';
+import 'package:cadastro_falhas/presentation/widgets/part_number_table_aproved.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 
@@ -44,20 +44,6 @@ class _AprovedFailureState extends State<AprovedFailure> {
           .toList();
 
       var filtrado = lista;
-
-      // var filtrado = lista.where((pn) {
-      //   var pnumber = pn.data()['partNumbers'];
-
-      //   for (var i = 0; i < pnumber.length; i++) {
-      //     var aproved = pnumber[i]['aproved'];
-
-      //     if (aproved == 2) {
-      //       return true;
-      //     }
-      //   }
-
-      //   return false;
-      // }).toList();
 
       filtrado.sort((a, b) {
         var aDate = a.data()['createdAt'];
@@ -124,7 +110,7 @@ class _AprovedFailureState extends State<AprovedFailure> {
                             scrollDirection: Axis.horizontal,
                             child: SingleChildScrollView(
                               scrollDirection: Axis.vertical,
-                              child: PartNumberTable(
+                              child: PartNumberTableAproved(
                                 data: data,
                               ),
                             ),

@@ -112,23 +112,37 @@ class FailureDAO {
 
   Future<void> update(FailureRegisterDTO updatedData, String docId) async {
     print('Atualiza falha no banco');
+
     try {
+      // Atualiza o documento principal
       await failureRef.doc(docId).update(updatedData.toJson());
 
       bool hasApproved = updatedData.partNumbers.any(
         (pn) => pn.aproved == ApprovalStatus.Aprovado,
       );
 
-      await _firestore.collection('failures_list').doc(docId).set({
-        'docId': docId,
-        'reqId': updatedData.reqId,
-        'requester': updatedData.requester,
-        'createdAt': updatedData.createdAt?.toIso8601String(),
-        'family': updatedData.partNumbers.isNotEmpty
-            ? updatedData.partNumbers.first.family
-            : '',
-        'hasApproved': hasApproved,
-      }, SetOptions(merge: true));
+      // Recupera o documento salvo para garantir que reqId e createdAt existam
+      var currentDoc = await failureRef.doc(docId).get();
+
+      if (currentDoc.exists) {
+        var current = FailureRegisterDTO.fromJson(
+          currentDoc.data() as Map<String, dynamic>,
+        );
+
+        await _firestore.collection('failures_list').doc(docId).set(
+          {
+            'docId': docId,
+            'reqId': current.reqId,
+            'requester': current.requester,
+            'createdAt': current.createdAt?.toIso8601String(),
+            'family': current.partNumbers.isNotEmpty
+                ? current.partNumbers.first.family
+                : '',
+            'hasApproved': hasApproved,
+          },
+          SetOptions(merge: true),
+        );
+      }
     } catch (e) {
       print('Erros ao atualizar dados: $e');
     }
