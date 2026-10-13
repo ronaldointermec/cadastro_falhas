@@ -38,6 +38,10 @@ class FailureDAO {
             (pn) => pn.aproved == ApprovalStatus.Aprovado,
           );
 
+          bool allApproved = failure.partNumbers.every(
+            (pn) => pn.aproved == ApprovalStatus.Aprovado,
+          );
+
           await failureRef.add(failure.toJson()).then(
             (DocumentReference doc) async {
               await _firestore.collection('failures_list').doc(doc.id).set({
@@ -49,6 +53,7 @@ class FailureDAO {
                     ? failure.partNumbers.first.family
                     : '',
                 'hasApproved': hasApproved,
+                'allApproved': allApproved,
               });
 
               print('Failure document created with ID: ${doc.id}');
@@ -70,6 +75,8 @@ class FailureDAO {
     }
   }
 
+  // Usar apenas para caso de atualização do banco failures_list
+  // (necessário descomentar uma linha do botão 'Cadastra Falha' na Home)
   Future<void> migrateFailureList() async {
     print('MIGRACAO INICIADA');
 
@@ -89,6 +96,10 @@ class FailureDAO {
         (pn) => pn.aproved == ApprovalStatus.Aprovado,
       );
 
+      bool allApproved = dto.partNumbers.every(
+        (pn) => pn.aproved == ApprovalStatus.Aprovado,
+      );
+
       await _firestore.collection('failures_list').doc(doc.id).set(
         {
           'docId': doc.id,
@@ -98,6 +109,7 @@ class FailureDAO {
           'family':
               dto.partNumbers.isNotEmpty ? dto.partNumbers.first.family : '',
           'hasApproved': hasApproved,
+          'allApproved': allApproved,
         },
         SetOptions(merge: true),
       );
@@ -121,6 +133,10 @@ class FailureDAO {
         (pn) => pn.aproved == ApprovalStatus.Aprovado,
       );
 
+      bool allApproved = updatedData.partNumbers.every(
+        (pn) => pn.aproved == ApprovalStatus.Aprovado,
+      );
+
       // Recupera o documento salvo para garantir que reqId e createdAt existam
       var currentDoc = await failureRef.doc(docId).get();
 
@@ -139,6 +155,7 @@ class FailureDAO {
                 ? current.partNumbers.first.family
                 : '',
             'hasApproved': hasApproved,
+            'allApproved': allApproved,
           },
           SetOptions(merge: true),
         );
