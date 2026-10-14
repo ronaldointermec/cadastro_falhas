@@ -42,6 +42,9 @@ class FailureDAO {
             (pn) => pn.aproved == ApprovalStatus.Aprovado,
           );
 
+          print(hasApproved);
+          print(hasApproved);
+
           await failureRef.add(failure.toJson()).then(
             (DocumentReference doc) async {
               await _firestore.collection('failures_list').doc(doc.id).set({
@@ -136,6 +139,9 @@ class FailureDAO {
       bool allApproved = updatedData.partNumbers.every(
         (pn) => pn.aproved == ApprovalStatus.Aprovado,
       );
+
+      print(hasApproved);
+      print(hasApproved);
 
       // Recupera o documento salvo para garantir que reqId e createdAt existam
       var currentDoc = await failureRef.doc(docId).get();
