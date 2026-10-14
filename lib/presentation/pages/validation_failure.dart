@@ -12,13 +12,15 @@ class ValidationFailure extends StatefulWidget {
 
 class _ValidationFailureState extends State<ValidationFailure> {
   final FailureDAO _failureDAO = FailureDAO();
-  DateTime? startDate, finalDate;
-  late Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>> filter =
-      Future.value([]);
 
-  void search() async {
+  DateTime? startDate, finalDate;
+
+  late Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>> filter;
+
+  Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>> search() async {
     List<DocumentSnapshot<Object?>> rawData =
         await _failureDAO.getAbertoParcial();
+
     var lista = rawData
         .map((snapshot) =>
             snapshot as QueryDocumentSnapshot<Map<String, dynamic>>)
@@ -26,18 +28,22 @@ class _ValidationFailureState extends State<ValidationFailure> {
 
     var filtrado = lista.where((pn) {
       var pnumber = pn.data()['partNumbers'];
+
       for (var i = 0; i < pnumber.length; i++) {
         var aproved = pnumber[i]['aproved'];
+
         if (aproved != 2) {
           return true;
         }
       }
+
       return false;
     }).toList();
 
     filtrado.sort((a, b) {
       var aDate = a.data()['createdAt'];
       var bDate = b.data()['createdAt'];
+
       if (aDate != startDate && bDate != finalDate) {
         return bDate.compareTo(aDate);
       } else if (aDate == startDate && bDate != finalDate) {
@@ -49,15 +55,13 @@ class _ValidationFailureState extends State<ValidationFailure> {
       }
     });
 
-    setState(() {
-      filter = Future.value(filtrado);
-    });
+    return filtrado;
   }
 
   @override
   void initState() {
     super.initState();
-    search();
+    filter = search();
   }
 
   @override
@@ -92,7 +96,7 @@ class _ValidationFailureState extends State<ValidationFailure> {
                       return Center(
                         child: Text('Error: ${snapshot.error}'),
                       );
-                    } else if (snapshot.hasData && snapshot.data != null) {
+                    } else if (snapshot.data?.isNotEmpty ?? false) {
                       return SingleChildScrollView(
                         scrollDirection: Axis.vertical,
                         child: PartNumberTable(
@@ -101,7 +105,10 @@ class _ValidationFailureState extends State<ValidationFailure> {
                       );
                     } else {
                       return const Center(
-                        child: Text('Nenhum dado encontrado.'),
+                        child: Text(
+                          'Nenhum dado encontrado.',
+                          style: TextStyle(fontSize: 18),
+                        ),
                       );
                     }
                   },
