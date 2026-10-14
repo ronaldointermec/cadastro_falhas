@@ -119,6 +119,10 @@ class _DeleteFailureState extends State<DeleteFailure> {
             (pn) => pn.aproved == ApprovalStatus.Aprovado,
           );
 
+          bool allApproved = updatedDto.partNumbers.every(
+            (pn) => pn.aproved == ApprovalStatus.Aprovado,
+          );
+
           await FirebaseFirestore.instance
               .collection('failures_list')
               .doc(docId)
@@ -131,6 +135,7 @@ class _DeleteFailureState extends State<DeleteFailure> {
                 ? updatedDto.partNumbers.first.family
                 : '',
             'hasApproved': hasApproved,
+            'allApproved': allApproved,
           }, SetOptions(merge: true));
         }
       } else {

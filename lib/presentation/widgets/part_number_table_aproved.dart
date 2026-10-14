@@ -80,29 +80,32 @@ class _PartNumberTableAprovedState extends State<PartNumberTableAproved> {
           )),
           DataCell(IconButton(
             icon: const Icon(Icons.delete),
-            onPressed: () async {
-              final dto = await _failureDAO.getFailureByDocId(item['docId']);
+            onPressed: item['allApproved'] == true
+                ? () async {
+                    final dto =
+                        await _failureDAO.getFailureByDocId(item['docId']);
 
-              if (dto == null) {
-                return;
-              }
+                    if (dto == null) {
+                      return;
+                    }
 
-              showDialog(
-                context: context,
-                builder: (context) {
-                  return DeleteFailure(
-                    dto: dto,
-                    docId: item['docId'],
-                  );
-                },
-              ).then((result) {
-                if (result == true) {
-                  setState(() {
-                    widget.data.removeAt(index);
-                  });
-                }
-              });
-            },
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return DeleteFailure(
+                          dto: dto,
+                          docId: item['docId'],
+                        );
+                      },
+                    ).then((result) {
+                      if (result == true) {
+                        setState(() {
+                          widget.data.removeAt(index);
+                        });
+                      }
+                    });
+                  }
+                : null,
           )),
         ]);
       }).toList(),
