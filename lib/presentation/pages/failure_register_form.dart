@@ -5,6 +5,7 @@ import 'package:cadastro_falhas/presentation/dto/failure_register_dto.dart';
 import 'package:cadastro_falhas/presentation/formatters/uppercase_formatter.dart';
 import 'package:cadastro_falhas/presentation/pages/home.dart';
 import 'package:cadastro_falhas/presentation/widgets/part_number_selection.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
@@ -44,7 +45,25 @@ class _FailureRegisterFormState extends State<FailureRegisterForm> {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
-        title: const Text('Cadastrar falha'),
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Image.asset(
+              'assets/brady.png',
+              height: 22,
+              fit: BoxFit.contain,
+            ),
+            const SizedBox(width: 8),
+            Flexible(
+              child: Text(
+                'Cadastrar falha',
+                overflow: TextOverflow.ellipsis,
+                style: TextStyle(fontSize: kIsWeb ? 18 : 15),
+              ),
+            ),
+          ],
+        ),
+        titleSpacing: 12,
       ),
       body: LayoutBuilder(builder: (context, constraint) {
         return ConstrainedBox(
