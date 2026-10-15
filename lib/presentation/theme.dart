@@ -2,41 +2,68 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 ThemeData theme = ThemeData(
-    elevatedButtonTheme:   ElevatedButtonThemeData(
+    useMaterial3: true,
+    colorScheme: ColorScheme.fromSeed(
+      seedColor: const Color(0xFF002B49), // Brady Blue
+      primary: const Color(0xFF002B49),
+      secondary: const Color(0xFF0A3367),
+      surface: Colors.white,
+    ),
+    elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
-        backgroundColor: Colors.black,
-        padding: const EdgeInsets.all(12),
+        backgroundColor: const Color(0xFF002B49),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
         foregroundColor: Colors.white,
-        textStyle: const TextStyle(fontSize: kIsWeb ? 18 : 14),
-        minimumSize: kIsWeb ?  const Size(180,60): const Size(120, 30) ,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(10),
+        textStyle: TextStyle(
+          fontSize: kIsWeb ? 16 : 14,
+          fontWeight: FontWeight.bold,
         ),
+        minimumSize: kIsWeb ? const Size(180, 56) : const Size(120, 44),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(12),
+        ),
+        elevation: 2,
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
-      border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+      filled: true,
+      fillColor: Colors.white,
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey.shade400),
+      ),
+      enabledBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide(color: Colors.grey.shade300),
+      ),
+      focusedBorder: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: const BorderSide(color: Color(0xFF002B49), width: 2),
+      ),
       errorStyle: const TextStyle(
         color: Colors.red,
       ),
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(10),
+        borderRadius: BorderRadius.circular(12),
         borderSide: const BorderSide(color: Colors.red),
       ),
     ),
-    appBarTheme: const  AppBarTheme(
-        centerTitle: true,
-        backgroundColor: Colors.black,
-        foregroundColor: Colors.white),
-    colorScheme: const ColorScheme(
-        brightness: Brightness.light,
-        primary: Colors.black,
-        onPrimary: Colors.white,
-        secondary: Colors.white,
-        onSecondary: Colors.black,
-        error: Colors.red,
-        onError: Colors.red,
-        background: Colors.white,
-        onBackground: Colors.black,
-        surface: Colors.white,
-        onSurface: Colors.black));
+    appBarTheme: const AppBarTheme(
+      centerTitle: false,
+      backgroundColor: Color(0xFF002B49),
+      foregroundColor: Colors.white,
+      elevation: 0,
+      titleTextStyle: TextStyle(
+        fontSize: 20,
+        fontWeight: FontWeight.bold,
+        color: Colors.white,
+      ),
+    ),
+    cardTheme: const CardThemeData(
+      elevation: 2,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.all(Radius.circular(12)),
+      ),
+      color: Colors.white,
+      margin: EdgeInsets.symmetric(vertical: 6, horizontal: 0),
+    ));

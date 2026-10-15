@@ -173,26 +173,69 @@ class FailureDAO {
 
   Future get(DateTime? startDate, DateTime? finalDate) async {
     print('Filtro por data: Consulta falha no banco');
-    var failures = await failureRef
-        .where('createdAt',
-            isGreaterThanOrEqualTo: startDate?.toIso8601String(),
-            isLessThanOrEqualTo: finalDate?.toIso8601String())
-        .get();
-    return failures.docs;
+    var snapshot = await failureRef.get();
+    var docs = snapshot.docs.where((doc) {
+      var data = doc.data() as Map<String, dynamic>?;
+      var createdAtStr = data?['createdAt'];
+      if (createdAtStr == null) return false;
+      try {
+        var createdAt = DateTime.parse(createdAtStr);
+        if (startDate != null && createdAt.isBefore(startDate)) return false;
+        if (finalDate != null && createdAt.isAfter(finalDate.add(const Duration(days: 1)))) return false;
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }).toList();
+
+    docs.sort((a, b) {
+      var aData = a.data() as Map<String, dynamic>;
+      var bData = b.data() as Map<String, dynamic>;
+      var aDate = aData['createdAt'];
+      var bDate = bData['createdAt'];
+      if (aDate != null && bDate != null) {
+        return bDate.compareTo(aDate);
+      }
+      return 0;
+    });
+
+    return docs.take(200).toList();
   }
 
   Future getAbertoParcial() async {
     print('getAbertoParcial: Consulta falha no banco');
-    var failures = await failureRef.get();
-    return failures.docs;
+    var snapshot = await failureRef.get();
+    var docs = snapshot.docs;
+    docs.sort((a, b) {
+      var aData = a.data() as Map<String, dynamic>;
+      var bData = b.data() as Map<String, dynamic>;
+      var aDate = aData['createdAt'];
+      var bDate = bData['createdAt'];
+      if (aDate != null && bDate != null) {
+        return bDate.compareTo(aDate);
+      }
+      return 0;
+    });
+    return docs.take(100).toList();
   }
 
   Future getApprovedSummary() async {
-    var failures = await _firestore
+    var snapshot = await _firestore
         .collection('failures_list')
         .where('hasApproved', isEqualTo: true)
         .get();
-    return failures.docs;
+    var docs = snapshot.docs;
+    docs.sort((a, b) {
+      var aData = a.data() as Map<String, dynamic>;
+      var bData = b.data() as Map<String, dynamic>;
+      var aDate = aData['createdAt'];
+      var bDate = bData['createdAt'];
+      if (aDate != null && bDate != null) {
+        return bDate.compareTo(aDate);
+      }
+      return 0;
+    });
+    return docs.take(100).toList();
   }
 
   Future<FailureRegisterDTO?> getFailureByDocId(String docId) async {

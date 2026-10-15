@@ -58,7 +58,25 @@ class _EditFailureState extends State<EditFailure> {
           )
         : Scaffold(
             appBar: AppBar(
-              title: Text('Editar  Falhas'),
+              title: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'assets/brady.png',
+                    height: 22,
+                    fit: BoxFit.contain,
+                  ),
+                  const SizedBox(width: 8),
+                  Flexible(
+                    child: Text(
+                      'Editar Falhas',
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(fontSize: kIsWeb ? 18 : 15),
+                    ),
+                  ),
+                ],
+              ),
+              titleSpacing: 12,
             ),
             body: SingleChildScrollView(
               scrollDirection: Axis.horizontal,

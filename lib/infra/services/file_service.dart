@@ -100,7 +100,7 @@ class FileService {
 
 
 
-  void createFailureRegisterCsv(dynamic snapshot) async {
+  Future<void> createFailureRegisterCsv(dynamic snapshot) async {
     List<List<dynamic>> rows = [];
     rows.add([
       "Requisitante",
@@ -132,7 +132,7 @@ class FileService {
           failure.quantity,
           failure.quantityServed,
           failure.numberMircossiga,
-          failure.aproved,
+          failure.aproved.name,
         ];
         rows.add(cells);
       }
