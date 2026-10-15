@@ -41,7 +41,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   json_serializable:
-
+  flutter_launcher_icons: ^0.13.1
   flutter_lints: ^6.0.0
 
 flutter:
@@ -49,3 +49,9 @@ flutter:
 
   assets:
     - assets/
+
+flutter_launcher_icons:
+  image_path: "assets/Brady_Logo_Blue.png"
+  android: true
+  ios: true
+  background_color: "#FFFFFF"
