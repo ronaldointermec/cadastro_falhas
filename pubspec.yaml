@@ -51,7 +51,11 @@ flutter:
     - assets/
 
 flutter_launcher_icons:
-  image_path: "assets/Brady_Logo_Blue.png"
   android: true
   ios: true
-  background_color: "#FFFFFF"
+  image_path: "assets/padded_blue_icon.png" # Mantido para compatibilidade e iOS
+
+  # Ajuste específico para o Android 8 até o Android 13+
+  adaptive_icon_background: "#002B49"      # Substitua pelo código HEX exato do azul do seu app
+  adaptive_icon_foreground: "assets/padded_blue_icon.png"
+  adaptive_icon_foreground_inset: 25        # Adiciona uma margem interna de 25% para diminuir o "B"
