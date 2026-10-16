@@ -1,21 +1,16 @@
 import 'package:cadastro_falhas/presentation/dto/failure_register_dto.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cadastro_falhas/presentation/dto/part_number_dto.dart';
 
 class FailureDAO {
   final CollectionReference failureRef =
       FirebaseFirestore.instance.collection('failures');
   FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  // Future<void> create(FailureRegisterDTO failure) async {
-  //   print('cria falha no banco');
-  //   await failureRef.add(failure.toJson()).then((DocumentReference doc) {
-  //     failure.docId = doc.id;
-  //   });
-  // }
-
   Future<void> create(FailureRegisterDTO failure) async {
     final DocumentReference counterRef =
-    _firestore.collection('counters').doc('documentCounter');
+        _firestore.collection('counters').doc('documentCounter');
 
     try {
       // Start the transaction
@@ -28,7 +23,8 @@ class FailureDAO {
 
         if (snapshot.exists) {
           // Increment the currentId
-          int newId = (snapshot['currentId'] ?? 0) + 1; // Ensuring it defaults to 0 if null
+          int newId = (snapshot['currentId'] ?? 0) +
+              1; // Ensuring it defaults to 0 if null
           print('New ID calculated: $newId');
 
           // Update the document
@@ -37,10 +33,35 @@ class FailureDAO {
 
           // Create a new failure document
           failure.reqId = newId.toString();
-          await failureRef.add(failure.toJson()).then((DocumentReference doc) {
-            failure.reqId = doc.id; // Set the ID of the new failure document
-            print('Failure document created with ID: ${doc.id}');
-          });
+
+          bool hasApproved = failure.partNumbers.any(
+            (pn) => pn.aproved == ApprovalStatus.Aprovado,
+          );
+
+          bool allApproved = failure.partNumbers.every(
+            (pn) => pn.aproved == ApprovalStatus.Aprovado,
+          );
+
+          print(hasApproved);
+          print(hasApproved);
+
+          await failureRef.add(failure.toJson()).then(
+            (DocumentReference doc) async {
+              await _firestore.collection('failures_list').doc(doc.id).set({
+                'docId': doc.id,
+                'reqId': newId.toString(),
+                'requester': failure.requester,
+                'createdAt': failure.createdAt?.toIso8601String(),
+                'family': failure.partNumbers.isNotEmpty
+                    ? failure.partNumbers.first.family
+                    : '',
+                'hasApproved': hasApproved,
+                'allApproved': allApproved,
+              });
+
+              print('Failure document created with ID: ${doc.id}');
+            },
+          );
         } else {
           print('Error: Counter document does not exist.');
         }
@@ -56,75 +77,95 @@ class FailureDAO {
       }
     }
   }
-  // Future<void> create(FailureRegisterDTO failure) async {
-  //   final DocumentReference counterRef =
-  //   _firestore.collection('counters').doc('documentCounter');
-  //
-  //   try {
-  //     // Start transaction
-  //     await _firestore.runTransaction((transaction) async {
-  //       print('Transaction started');
-  //
-  //       // Get the document snapshot
-  //       DocumentSnapshot snapshot = await transaction.get(counterRef);
-  //       print('Document snapshot retrieved: ${snapshot.exists}');
-  //
-  //       if (snapshot.exists) {
-  //         // Increment the ID
-  //         int newId = (snapshot['documentCounter'] ?? 0) + 1; // Ensure default if null
-  //         print('New ID calculated: $newId');
-  //
-  //         // Update the document
-  //         transaction.update(counterRef, {'documentCounter': newId});
-  //         print('Counter updated successfully');
-  //
-  //         // Create a new failure document
-  //         failure.docId = newId.toString();
-  //         await failureRef.add(failure.toJson()).then((DocumentReference doc) {
-  //           failure.docId = doc.id; // Set the ID of the new failure document
-  //           print('Failure document created with ID: ${doc.id}');
-  //         });
-  //       } else {
-  //         print('Error: Counter document does not exist.');
-  //       }
-  //     });
-  //   } catch (error, stackTrace) {
-  //     print('Error occurred during transaction: $error');
-  //     print('Stack trace: $stackTrace');
-  //
-  //     // If the error is a FirebaseException
-  //     if (error is FirebaseException) {
-  //       print('Firebase error: ${error.message}');
-  //     } else {
-  //       print('Unexpected error: ${error.toString()}');
-  //     }
-  //   }
-  // }
 
-  // Future<void> create(FailureRegisterDTO failure) async {
-  //   final DocumentReference counterRef =
-  //       _firestore.collection('counters').doc('documentCounter');
-  //
-  //   // executa a transaction para garantir a leitura e incrementar o contator
-  //   await _firestore.runTransaction((transaction) async {
-  //     DocumentSnapshot snapshot = await transaction.get(counterRef);
-  //     int newId = snapshot['documentCounter'] + 1; // increment o id
-  //
-  //     //atualiza o contador no documento
-  //     transaction.update(counterRef, {'currentId': newId});
-  //
-  //     // cria um novo documento de falha com o ID incrementado
-  //     failure.docId = newId.toString();
-  //     await failureRef.add(failure.toJson()).then((DocumentReference doc) {
-  //       failure.docId = doc.id;
-  //     });
-  //   });
-  // }
+  // Usar apenas para caso de atualização do banco failures_list
+  // (necessário descomentar uma linha do botão 'Cadastra Falha' na Home)
+  Future<void> migrateFailureList() async {
+    print('MIGRACAO INICIADA');
+
+    var failures = await failureRef.get();
+
+    print('REGISTROS ENCONTRADOS: ${failures.docs.length}');
+
+    int contador = 0;
+
+    for (var doc in failures.docs) {
+      contador++;
+
+      FailureRegisterDTO dto =
+          FailureRegisterDTO.fromJson(doc.data() as Map<String, dynamic>);
+
+      bool hasApproved = dto.partNumbers.any(
+        (pn) => pn.aproved == ApprovalStatus.Aprovado,
+      );
+
+      bool allApproved = dto.partNumbers.every(
+        (pn) => pn.aproved == ApprovalStatus.Aprovado,
+      );
+
+      await _firestore.collection('failures_list').doc(doc.id).set(
+        {
+          'docId': doc.id,
+          'reqId': dto.reqId,
+          'requester': dto.requester,
+          'createdAt': dto.createdAt?.toIso8601String(),
+          'family':
+              dto.partNumbers.isNotEmpty ? dto.partNumbers.first.family : '',
+          'hasApproved': hasApproved,
+          'allApproved': allApproved,
+        },
+        SetOptions(merge: true),
+      );
+
+      if (contador % 100 == 0) {
+        print('PROCESSADOS: $contador');
+      }
+    }
+
+    print('MIGRACAO CONCLUIDA');
+  }
 
   Future<void> update(FailureRegisterDTO updatedData, String docId) async {
     print('Atualiza falha no banco');
+
     try {
+      // Atualiza o documento principal
       await failureRef.doc(docId).update(updatedData.toJson());
+
+      bool hasApproved = updatedData.partNumbers.any(
+        (pn) => pn.aproved == ApprovalStatus.Aprovado,
+      );
+
+      bool allApproved = updatedData.partNumbers.every(
+        (pn) => pn.aproved == ApprovalStatus.Aprovado,
+      );
+
+      print(hasApproved);
+      print(hasApproved);
+
+      // Recupera o documento salvo para garantir que reqId e createdAt existam
+      var currentDoc = await failureRef.doc(docId).get();
+
+      if (currentDoc.exists) {
+        var current = FailureRegisterDTO.fromJson(
+          currentDoc.data() as Map<String, dynamic>,
+        );
+
+        await _firestore.collection('failures_list').doc(docId).set(
+          {
+            'docId': docId,
+            'reqId': current.reqId,
+            'requester': current.requester,
+            'createdAt': current.createdAt?.toIso8601String(),
+            'family': current.partNumbers.isNotEmpty
+                ? current.partNumbers.first.family
+                : '',
+            'hasApproved': hasApproved,
+            'allApproved': allApproved,
+          },
+          SetOptions(merge: true),
+        );
+      }
     } catch (e) {
       print('Erros ao atualizar dados: $e');
     }
@@ -132,17 +173,85 @@ class FailureDAO {
 
   Future get(DateTime? startDate, DateTime? finalDate) async {
     print('Filtro por data: Consulta falha no banco');
-    var failures = await failureRef
-        .where('createdAt',
-            isGreaterThanOrEqualTo: startDate?.toIso8601String(),
-            isLessThanOrEqualTo: finalDate?.toIso8601String())
-        .get();
-    return failures.docs;
+    var snapshot = await failureRef.get();
+    var docs = snapshot.docs.where((doc) {
+      var data = doc.data() as Map<String, dynamic>?;
+      var createdAtStr = data?['createdAt'];
+      if (createdAtStr == null) return false;
+      try {
+        var createdAt = DateTime.parse(createdAtStr);
+        if (startDate != null && createdAt.isBefore(startDate)) return false;
+        if (finalDate != null && createdAt.isAfter(finalDate.add(const Duration(days: 1)))) return false;
+        return true;
+      } catch (_) {
+        return false;
+      }
+    }).toList();
+
+    docs.sort((a, b) {
+      var aData = a.data() as Map<String, dynamic>;
+      var bData = b.data() as Map<String, dynamic>;
+      var aDate = aData['createdAt'];
+      var bDate = bData['createdAt'];
+      if (aDate != null && bDate != null) {
+        return bDate.compareTo(aDate);
+      }
+      return 0;
+    });
+
+    return docs.take(200).toList();
   }
 
   Future getAbertoParcial() async {
     print('getAbertoParcial: Consulta falha no banco');
-    var failures = await failureRef.get();
-    return failures.docs;
+    var snapshot = await failureRef.get();
+    var docs = snapshot.docs;
+    docs.sort((a, b) {
+      var aData = a.data() as Map<String, dynamic>;
+      var bData = b.data() as Map<String, dynamic>;
+      var aDate = aData['createdAt'];
+      var bDate = bData['createdAt'];
+      if (aDate != null && bDate != null) {
+        return bDate.compareTo(aDate);
+      }
+      return 0;
+    });
+    return docs.take(100).toList();
+  }
+
+  Future getApprovedSummary() async {
+    var snapshot = await _firestore
+        .collection('failures_list')
+        .where('hasApproved', isEqualTo: true)
+        .get();
+    var docs = snapshot.docs;
+    docs.sort((a, b) {
+      var aData = a.data() as Map<String, dynamic>;
+      var bData = b.data() as Map<String, dynamic>;
+      var aDate = aData['createdAt'];
+      var bDate = bData['createdAt'];
+      if (aDate != null && bDate != null) {
+        return bDate.compareTo(aDate);
+      }
+      return 0;
+    });
+    return docs.take(100).toList();
+  }
+
+  Future<FailureRegisterDTO?> getFailureByDocId(String docId) async {
+    try {
+      var doc = await failureRef.doc(docId).get();
+
+      if (!doc.exists) {
+        return null;
+      }
+
+      return FailureRegisterDTO.fromJson(
+        doc.data() as Map<String, dynamic>,
+      );
+    } catch (e) {
+      print('Erro ao recuperar falha: $e');
+      return null;
+    }
   }
 }

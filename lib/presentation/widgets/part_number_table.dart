@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:cadastro_falhas/presentation/dto/failure_register_dto.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
@@ -33,12 +31,11 @@ class _PartNumberTableState extends State<PartNumberTable> {
         DataColumn(label: Expanded(child: Text('Excluir'))),
       ],
       rows: widget.data.asMap().entries.map((element) {
-
         FailureRegisterDTO dto =
             FailureRegisterDTO.fromJson(element.value.data());
         int index = element.key;
 
-                // Atribui o ID e incrementa o contador
+        // Atribui o ID e incrementa o contador
         int currentId = 0;
         if (dto.reqId != null) {
           currentId = int.tryParse(dto.reqId!) ?? idCounter++;

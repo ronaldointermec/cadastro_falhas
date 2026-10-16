@@ -6,7 +6,7 @@ class Global {
   static final FirebaseAuth auth = FirebaseAuth.instance;
   static final FirebaseFirestore firebaseInstance = FirebaseFirestore.instance;
   static final usuarioAtual = auth.currentUser;
-  static final Color backgroundColor = Colors.lightBlueAccent;
+  static final Color backgroundColor = const Color(0xFF002B49); // Brady Blue
   static final String family = 'family';
   static final String rejectionReasonNEW = 'rejectionReasonNEW';
   static final String familia = 'Família';
