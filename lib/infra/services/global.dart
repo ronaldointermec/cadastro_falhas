@@ -11,5 +11,5 @@ class Global {
   static final String rejectionReasonNEW = 'rejectionReasonNEW';
   static final String familia = 'Família';
   static final String backendUrl = "http://hic041474:8096/refurbish";
-  static final String appVersion = 'Versão 1.0.0.4 @ Honeywell 2026';
+  static final String appVersion = 'Versão 1.0.0.5 @ Honeywell 2026';
 }
