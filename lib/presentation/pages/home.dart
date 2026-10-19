@@ -158,10 +158,7 @@ class Home extends StatelessWidget {
           }
         },
       },
-    ];
-
-    if (!kIsWeb) {
-      menuItems.add({
+      {
         'title': 'Configurar Impressora',
         'subtitle': 'Configurar endereço IP para socket térmico',
         'icon': Icons.print_outlined,
@@ -177,8 +174,8 @@ class Home extends StatelessWidget {
             },
           );
         },
-      });
-    }
+      },
+    ];
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F6F8),

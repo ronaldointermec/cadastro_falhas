@@ -8,7 +8,7 @@ import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 
 import '../../infra/services/mobile_socket_service.dart';
-import 'package:flutter/foundation.dart';
+import '../../infra/services/web_print_service.dart';
 
 class EditFailure extends StatefulWidget {
   EditFailure({required this.dto, required this.docId});
@@ -237,27 +237,29 @@ class _EditFailureState extends State<EditFailure> {
                         const SizedBox(
                           height: 24.0,
                         ),
-                        !kIsWeb
-                            ? IconButton(
-                                tooltip: 'Impressão de etiquetas',
-                                onPressed: () {
-                                  if (widget.dto != null) {
-                                    // MobileSocketService sockect =
-                                    // MobileSocketService(dto: widget.dto,index: -1);
-                                    // sockect.connectToSocket();
-
-                                    context
-                                        .read<MobileSocketService>()
-                                        .connectToSocket(
-                                            dto: widget.dto, index: -1);
-                                  }
-                                },
-                                icon: const Icon(
-                                  Icons.print,
-                                  size: 60,
-                                ),
-                              )
-                            : Container(),
+                        IconButton(
+                          tooltip: 'Impressão de etiquetas',
+                          onPressed: () {
+                            if (widget.dto != null) {
+                              if (kIsWeb) {
+                                WebPrintService.printFailure(
+                                  context: context,
+                                  dto: widget.dto,
+                                  index: -1,
+                                );
+                              } else {
+                                context
+                                    .read<MobileSocketService>()
+                                    .connectToSocket(
+                                        dto: widget.dto, index: -1);
+                              }
+                            }
+                          },
+                          icon: const Icon(
+                            Icons.print,
+                            size: 60,
+                          ),
+                        ),
                       ],
                     ),
                   ),
