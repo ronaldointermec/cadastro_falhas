@@ -1,6 +1,7 @@
 import 'package:cadastro_falhas/infra/dao/failure_dao.dart';
 import 'package:cadastro_falhas/infra/providers/family_provider.dart';
 import 'package:cadastro_falhas/infra/services/mobile_socket_service.dart';
+import 'package:cadastro_falhas/infra/services/web_print_service.dart';
 import 'package:cadastro_falhas/presentation/dto/failure_register_dto.dart';
 import 'package:cadastro_falhas/presentation/widgets/part_number_selection.dart';
 import 'package:flutter/material.dart';
@@ -445,26 +446,29 @@ class _EditPartNumberState extends State<EditPartNumber> {
                       const SizedBox(
                         height: 24.0,
                       ),
-                      !kIsWeb
-                          ? IconButton(
-                              tooltip: 'Impressão de etiqueta',
-                              onPressed: () {
-                                if (widget.index != null &&
-                                    widget.dto != null) {
-                                  // MobileSocketService sockect = MobileSocketService(
-                                  //     dto: widget.dto, index: widget.index);
-                                  context
-                                      .read<MobileSocketService>()
-                                      .connectToSocket(
-                                          dto: widget.dto, index: widget.index);
-                                }
-                              },
-                              icon: const Icon(
-                                Icons.print,
-                                size: 60,
-                              ),
-                            )
-                          : Container(),
+                      IconButton(
+                        tooltip: 'Impressão de etiqueta',
+                        onPressed: () {
+                          if (widget.index != null && widget.dto != null) {
+                            if (kIsWeb) {
+                              WebPrintService.printFailure(
+                                context: context,
+                                dto: widget.dto!,
+                                index: widget.index!,
+                              );
+                            } else {
+                              context
+                                  .read<MobileSocketService>()
+                                  .connectToSocket(
+                                      dto: widget.dto, index: widget.index);
+                            }
+                          }
+                        },
+                        icon: const Icon(
+                          Icons.print,
+                          size: 60,
+                        ),
+                      ),
                     ],
                   ),
                 ),

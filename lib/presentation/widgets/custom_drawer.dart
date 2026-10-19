@@ -196,7 +196,7 @@ class CustomDrawer extends StatelessWidget {
             child: Align(
               alignment: Alignment.center,
               child: Text(
-                'Versão 1.0.0.4 @ Honeywell 2026',
+                Global.appVersion,
                 style: TextStyle(
                   color: Colors.white,
                   fontSize: 12.0,
